@@ -12,5 +12,5 @@ accepted-manifest.json
 source-manifest.json
 text-review.json
 visual-review.json
-# Machine-local preferences, scoped only to SF Digital Skills Academy.
+# Machine-local preferences, scoped only to Digital Skills Academy.
 /plugins/sf-digital-skills-academy/LOCAL_MEMORY.md

@@ -63,7 +63,7 @@ class GoldenZoneChecks(unittest.TestCase):
         self.assertGreater(result["links"],0)
         self.assertEqual(check_zones(path,data["zone_plan"]["path"])["workflow"],"DIRECT_SKILL_NO_FACT_CHECK_GATE")
 
-    def test_each_section_starts_without_pattern(self):
+    def test_first_lecture_page_has_motif_and_later_sections_start_clean(self):
         self.lecture["structure"]["sections"].append(dict(section_id="sec2",number="2",title="Второй раздел"))
         self.lecture["structure"]["topics"][1]["section_id"]="sec2"
         self.lecture["structure"]["placements"][1]["section_id"]="sec2"
@@ -71,9 +71,12 @@ class GoldenZoneChecks(unittest.TestCase):
         with fitz.open(data["artifacts"]["pdf"]["path"]) as doc:
             starts=[row[2] for row in doc.get_toc() if row[0]==1 and row[1]!="Содержание"]
             self.assertEqual(len(starts),2)
-            for number in starts:
-                self.assertFalse(any((im["width"],im["height"])==(1392,1883)
-                                     for im in doc[number-1].get_image_info()))
+            motif=(508,490)
+            self.assertTrue(any((im[2],im[3])==motif
+                                for im in doc[starts[0]-1].get_images(full=True)))
+            for number in starts[1:]:
+                self.assertFalse(any((im[2],im[3])==motif
+                                     for im in doc[number-1].get_images(full=True)))
 
     def test_file_extensions_in_body_survive_complete_validation(self):
         self.lecture["blocks"][0]["content"]=[{"type":"paragraph","runs":[{"type":"text","text":

@@ -1,7 +1,7 @@
 {
   "name": "sf-digital-skills-academy",
   "interface": {
-    "displayName": "SF Digital Skills Academy"
+    "displayName": "Digital Skills Academy"
   },
   "plugins": [
     {

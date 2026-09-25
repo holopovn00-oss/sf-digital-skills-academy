@@ -1,14 +1,14 @@
 ---
 name: sf-lecture-to-golden-pdf
-description: Use when an already prepared lecture text must become an SF Education A4 PDF according to Golden Gate, including supplied visuals, full text preservation, navigation and page review. Not for rewriting a raw transcript.
+description: Use when an already prepared lecture text must become an Digital Skills Academy A4 PDF according to Golden Gate, including supplied visuals, full text preservation, navigation and page review. Not for rewriting a raw transcript.
 ---
 
 # Лекционный текст → PDF по Golden Gate
 
-Перед работой прочитай [правила именно этого плагина](../../AGENTS.md); они также подключают необязательную локальную память SF Digital Skills Academy.
+Перед работой прочитай [правила именно этого плагина](../../AGENTS.md); они также подключают необязательную локальную память Digital Skills Academy.
 
 
-Подготовь A4 PDF из полного готового лекционного текста по закреплённому Golden Gate SF Education. Текст определяет содержание и объём; эталон определяет оформление. Итоговое число страниц не ограничено 28 страницами принятого эталона.
+Подготовь A4 PDF из полного готового лекционного текста по закреплённому Golden Gate Digital Skills Academy. Текст определяет содержание и объём; эталон определяет оформление. Итоговое число страниц не ограничено 28 страницами принятого эталона.
 
 Этот навык имеет два входа. Прямой `$sf-lecture-to-golden-pdf` использует готовый текст без редактуры и фактчека: `workflow.mode:"direct_skill"`. Из полного цикла принимается только `workflow.mode:"full_cycle"` с проверяемым handoff фактчека. Поставляемый [render_golden.py](../../scripts/render_golden.py) создает обложку, содержание, зоны, предоставленные растровые визуалы, формулы и навигацию по закрепленному профилю. Используй его как основной рендерер; нестандартный материал адаптируй адресно без переписывания лекции и обхода проверок. SF Lecture Publisher и его MCP не требуются.
 

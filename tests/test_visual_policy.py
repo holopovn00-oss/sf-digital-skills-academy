@@ -85,6 +85,11 @@ class VisualPolicyTests(unittest.TestCase):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 caption_fields(invalid)
 
+    def test_video_label_is_not_printed_in_visual_caption(self):
+        caption='Источник: Презентация\nСлайд № 12\nТема: Расчет\nВидео: 00:01:04 – 00:03:21'
+        with self.assertRaisesRegex(ValueError, 'Video label'):
+            caption_fields(caption)
+
     def test_wrapped_fields_and_explicit_blank_permission(self):
         text='Источник: Длинное название\nпрезентации\nСлайд № 12\nТема: Первое\nпродолжение'
         self.assertEqual(caption_fields(text), ['Длинное название\nпрезентации','12','Первое\nпродолжение'])

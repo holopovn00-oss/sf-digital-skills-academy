@@ -1,4 +1,4 @@
-# GitHub gates for SF Digital Skills Academy
+# GitHub gates for Digital Skills Academy
 
 This document is a repository policy record. It does not replace repository settings: a GitHub administrator must configure the protection described below.
 
@@ -15,6 +15,6 @@ The repository workflow cannot impose these repository settings by itself.
 
 ## Full PDF release gate
 
-`Release validation / release-validate` is the complete mechanical gate for changes that affect PDF composition, math, Golden resources, their validators or their tests. It installs pinned Tectonic 0.15.0, primes an isolated task cache deliberately; if a required TeX package is missing, the release process may explicitly add it only to that cache, then runs the complete test suite with `SF_RELEASE_VALIDATION=1`, rejects every skipped test and validates pinned resources.
+`Release validation / release-validate` is the complete mechanical gate for changes that affect PDF composition, math, Golden resources, their validators or their tests. It installs pinned Tectonic 0.17.0, primes an isolated task cache deliberately; if a required TeX package is missing, the release process may explicitly add it only to that cache, then runs the complete test suite with `SF_RELEASE_VALIDATION=1`, rejects every skipped test and validates pinned resources.
 
 Run this workflow for the final candidate before creating or moving a release/tag. Its successful result still does not replace the visual review of every candidate page, semantic review or manual acceptance.

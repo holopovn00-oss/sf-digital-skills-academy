@@ -1,22 +1,22 @@
 {
   "name": "sf-digital-skills-academy",
   "version": "0.1.0",
-  "description": "Полный цикл SF: материалы → учебный текст → фактчек с решениями → PDF-кандидат; прямые навыки выполняют только выбранный этап.",
+  "description": "Полный цикл Digital Skills Academy: материалы → учебный текст → фактчек с решениями → PDF-кандидат; прямые навыки выполняют только выбранный этап.",
   "author": {
     "name": "holopovn00-oss",
     "url": "https://github.com/holopovn00-oss"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "SF Digital Skills Academy",
+    "displayName": "Digital Skills Academy",
     "shortDescription": "Полный цикл или прямой выбранный навык.",
     "longDescription": "Общий вход запускает полный цикл: материалы, учебный текст JSON с LaTeX, фактчек с решениями человека, выбранная новая редакция и PDF-кандидат. Три специализированных навыка остаются прямыми изолированными режимами: они не переходят к следующему этапу автоматически.",
     "developerName": "holopovn00-oss",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": "Используй $sf-digital-skills-academy. Проведи полный цикл по добавленным материалам: сначала образец учебной редактуры, затем полный LectureText, фактчек с решениями человека и PDF-кандидат только после успешного fact-check gate. Если материалов нет, попроси прикрепить их. Для отдельного этапа пользователь должен явно вызвать соответствующий специализированный навык.",
-    "logo": "./skills/sf-lecture-to-golden-pdf/assets/a4/sf-internal-lockup.png",
-    "brandColor": "#0089FF"
+    "logo": "./skills/sf-lecture-to-golden-pdf/assets/a4/digital-skills-academy-logo.png",
+    "brandColor": "#BD0C1E"
   },
   "repository": "https://github.com/holopovn00-oss/sf-digital-skills-academy",
   "homepage": "https://github.com/holopovn00-oss/sf-digital-skills-academy#readme",
@@ -26,7 +26,7 @@
     "fact-checking",
     "academic-evidence",
     "pdf",
-    "sf-education",
-    "russian"
+    "russian",
+    "digital-skills-academy"
   ]
 }

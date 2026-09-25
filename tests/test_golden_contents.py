@@ -55,7 +55,7 @@ class GoldenContentsChecks(unittest.TestCase):
         self.assertEqual(found,[t["topic_id"] for t in structure["topics"]])
         self.assertTrue(any("продолжение" in " ".join(e["lines"]) for p in pages[1:] for e in p))
 
-    def test_actual_underlines_dividers_and_long_page_labels(self):
+    def test_graphite_topics_dividers_and_long_page_labels(self):
         structure=self.structure(2,2)
         destinations={t["topic_id"]:1000+i for i,t in enumerate(structure["topics"])}
         number_width=max(text_width("стр. "+str(v),self.pt["toc_page_size"]) for v in destinations.values())
@@ -86,11 +86,14 @@ class GoldenContentsChecks(unittest.TestCase):
             lines=[(d,item) for d in page.get_drawings() for item in d["items"] if item[0]=="l"]
             gray=[item for d,item in lines if d["color"] and max(d["color"])-min(d["color"])<.001]
             self.assertEqual(len(gray),2)
-            blue=[item for d,item in lines if d["color"] and d["color"][2]>.9 and d["color"][0]<.01]
+            self.assertEqual(len(lines),2)
             expected=sum(len(e["lines"]) for e in entries if not e["section_heading"])
-            self.assertEqual(len(blue),expected)
+            self.assertEqual(sum(s["color"]==0x263238 for s in spans),expected)
             for value,box,color,bold in printed:
-                self.assertEqual(page.get_textbox(fitz.Rect(box)).strip(),value)
+                matching=[span for span in spans if span["text"]==value
+                          and abs(span["bbox"][0]-box[0])<1
+                          and abs(span["bbox"][1]-box[1])<2]
+                self.assertTrue(matching,(value,box))
             for label in labels:
                 self.assertTrue(any(abs(label["bbox"][2]-right*MM)<.1 for right in (101,196)))
 
@@ -100,6 +103,8 @@ class GoldenContentsChecks(unittest.TestCase):
             labels=[s for b in page.get_text("dict")["blocks"] if b["type"]==0
                     for l in b["lines"] for s in l["spans"] if s["text"].startswith("стр. ")]
             links=page.get_links()
+            spans=[s for b in page.get_text("dict")["blocks"] if b["type"]==0 for l in b["lines"] for s in l["spans"]]
+            self.assertEqual(sum(s["color"]==0x263238 and abs(s["size"]-8.8)<.05 for s in spans),40)
             topics=[entry for entry in doc.get_toc() if entry[0]==2]
             self.assertEqual(len(labels),len(topics))
             self.assertEqual(len(links),len(topics))

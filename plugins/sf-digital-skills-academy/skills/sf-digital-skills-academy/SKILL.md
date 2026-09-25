@@ -1,11 +1,11 @@
 ---
 name: sf-digital-skills-academy
-description: "Start the complete SF Digital Skills Academy cycle: source materials to accepted lecture text, human-decided fact check, and Golden Gate PDF candidate. Use direct specialist skills only when the user explicitly selects one."
+description: "Start the complete Digital Skills Academy cycle: source materials to accepted lecture text, human-decided fact check, and Golden Gate PDF candidate. Use direct specialist skills only when the user explicitly selects one."
 ---
 
-# SF Digital Skills Academy: полный цикл
+# Digital Skills Academy: полный цикл
 
-Перед работой прочитай [правила именно этого плагина](../../AGENTS.md); они также подключают необязательную локальную память SF Digital Skills Academy.
+Перед работой прочитай [правила именно этого плагина](../../AGENTS.md); они также подключают необязательную локальную память Digital Skills Academy.
 
 
 Этот общий вход запускает только **полный цикл**: от материалов лекции до PDF-кандидата по Golden Gate. Он не предлагает упрощенные варианты и не заменяет явно выбранный специализированный навык.

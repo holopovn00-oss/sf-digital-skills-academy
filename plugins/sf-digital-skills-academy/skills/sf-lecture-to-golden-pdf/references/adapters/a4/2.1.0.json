@@ -3,7 +3,7 @@
   "$id": "https://sf.education/sf-digital-skills-academy/adapters/a4/2.1.0",
   "adapter_id": "sf-a4-pdf",
   "version": "2.1.0",
-  "layout_revision": "2026-09-18",
+  "layout_revision": "2026-09-26",
   "text_alignment": "justify-last-left",
   "hyphenation": "ru-RU-layout-only",
   "max_word_space_ratio": 3,
@@ -22,36 +22,24 @@
   "powerpoint_runtime": false,
   "rights_status": "CONFIRMED",
   "document_grammar_contract": "contracts/a4/document-golden-gate-2.1.0.json",
-  "document_grammar_sha256": "DAD081E0651EDDB0CC98FECBB9BFEF5A06A8F59CA787866735843CA1919F7C34",
+  "document_grammar_sha256": "9B069B7362285F372493252AC7BA3101269F9767564C9185D5DE75DEFF2E36B3",
   "font": {
     "family": "Inter",
     "delivery": "external-verified",
     "math": "embedded-TeX-math-fonts-in-verified-formulas-only"
   },
   "brand_assets": {
-    "partner_mincifry": {
-      "path": "assets/a4/partner-mincifry-white.png",
-      "sha256": "576DF4D7B076ADADE102DB3CF151D1EF1CF5179CFE4A694A7CBE779501D927C2"
+    "cover_photo": {
+      "path": "assets/a4/digital-skills-academy-cover.jpeg",
+      "sha256": "633243B6031CFFAA35DBFC3F5B57BDD8DBDC1DC1A02F70E3858BAF2251C026F4"
     },
-    "partner_skolkovo": {
-      "path": "assets/a4/partner-skolkovo-white.png",
-      "sha256": "F485120A419656E2B8DF16C892E82DF2D8B059AD59E76E3E033769645867544D"
+    "logo": {
+      "path": "assets/a4/digital-skills-academy-logo.png",
+      "sha256": "AD1825FE30123FECF6ACD08F012919EDBF5D5825062B3F2A56FA4A0511D82607"
     },
-    "cover_lockup": {
-      "path": "assets/a4/sf-cover-lockup.png",
-      "sha256": "7DF3EFC9A1A5DC4C2B8C764E0EF9C4ADBCDFC34066D20E88A860A8A1570C1AE7"
-    },
-    "internal_lockup": {
-      "path": "assets/a4/sf-internal-lockup.png",
-      "sha256": "DF156292B6594114F1FD31C2A2AAE9FECB0A22CFD4918376F16C913107D29638"
-    },
-    "cover_pattern": {
-      "path": "assets/a4/cover-pattern.png",
-      "sha256": "DEADAF51B588EC5A6311C5118A5308E7E3964328D31B2658E8D0337DCCBB97A0"
-    },
-    "internal_pattern": {
-      "path": "assets/a4/internal-pattern.png",
-      "sha256": "FDBF71ABA7D5134876DCEEFABEE3081C7472D34ACF875FDA999E2E828B659464"
+    "motif": {
+      "path": "assets/a4/digital-skills-academy-motif.png",
+      "sha256": "86325BDA49D3731FD779A213602A0316918B4520988F94B3D2770F909838064C"
     }
   },
   "visual_tokens": {
@@ -59,16 +47,13 @@
     "surface": "#FFFFFF",
     "text": "#333333",
     "muted": "#777777",
-    "brand": "#0082FF",
-    "link": "#0066CC",
-    "focus": "#0057B8",
+    "brand": "#BD0C1E",
+    "link": "#BD0C1E",
+    "focus": "#9B0A1A",
     "border": "#D9D9D9",
-    "blue": "#C6E3FF",
-    "amber": "#FFEDC6",
-    "mint": "#C6FFDB",
-    "lilac": "#C6D4FF",
-    "peach": "#FFDCD3",
-    "aqua": "#C6FCFF"
+    "cover_text": "#1F1F1F",
+    "toc_topic": "#263238",
+    "rose": "#F3CFD4"
   },
   "allowed_components": [
     "cover",
@@ -107,12 +92,7 @@
   "section_rail": {
     "scope": "section-rail-only",
     "cycle": [
-      "blue",
-      "amber",
-      "mint",
-      "lilac",
-      "peach",
-      "aqua"
+      "rose"
     ]
   },
   "source_adapter_commit": "44bd83bd0dafa77c20dedb76ff046dbb0eaa1cfa",
@@ -137,30 +117,11 @@
       "paragraph_extra_gap": 0,
       "paragraph_first_line_indent": 5,
       "display_math_extra_gap": 4,
-      "cover_pattern_bottom": 297,
-      "cover_pattern_width": 210,
-      "cover_sf_x": 147.1,
-      "cover_sf_width": 48.9,
-      "cover_header_top": 14,
-      "cover_header_height": 10.6,
-      "mincifry_x": 14,
-      "mincifry_width": 29.1,
-      "skolkovo_x": 48.9,
-      "skolkovo_width": 31,
-      "cover_title_x": 14,
+      "cover_title_x": 15.5,
       "cover_title_width": 160,
-      "cover_title_bottom": 231,
-      "cover_label_gap": 14,
+      "cover_title_bottom": 223,
+      "cover_label_gap": 8,
       "header_clearance": 4,
-      "cover_rule_y": 246,
-      "cover_rule_width": 160,
-      "internal_pattern_x": 127.5,
-      "internal_pattern_y": 168.3,
-      "internal_pattern_width": 117.83,
-      "internal_pattern_height": 159.34750164153044,
-      "internal_sf_x": 161.9,
-      "internal_sf_y": 14,
-      "internal_sf_width": 34.1,
       "section_label_top": 14.6,
       "heading_width": 135,
       "topic_title_top": 21.6,
@@ -175,7 +136,6 @@
       "image_max_height": 91.02,
       "card_padding": 3,
       "image_caption_gap": 3,
-      "caption_video_gap": 2,
       "card_following_gap": 5,
       "card_radius": 2.3,
       "toc_margin_x": 14,
@@ -202,13 +162,32 @@
       "footer_text_top": 278,
       "footer_link_gap": 5,
       "footer_number_gap": 5,
-      "footer_number_width": 20
+      "footer_number_width": 20,
+      "cover_photo_x": -209.55,
+      "cover_photo_y": 0,
+      "cover_photo_width": 629,
+      "cover_photo_height": 353.8,
+      "cover_overlay_top": 148.5,
+      "cover_logo_x": 141.1,
+      "cover_logo_y": 12,
+      "cover_logo_width": 55,
+      "cover_bar_top": 245.5,
+      "cover_bar_height": 21.9,
+      "cover_bar_text_x": 15.5,
+      "cover_bar_text_top": 252.6,
+      "internal_motif_x": 153.46,
+      "internal_motif_y": 238.8,
+      "internal_motif_width": 52.92,
+      "internal_motif_height": 51.15,
+      "internal_logo_x": 169.3,
+      "internal_logo_y": 12,
+      "internal_logo_width": 26.8
     },
     "pt": {
       "body_size": 9.5,
       "body_leading": 13.1,
-      "cover_title_size": 44,
-      "cover_title_leading": 46,
+      "cover_title_size": 39,
+      "cover_title_leading": 47,
       "small_label_size": 7.75,
       "small_label_leading": 10.5,
       "topic_title_size": 26,
@@ -221,7 +200,7 @@
       "video_leading": 10.5,
       "toc_section_size": 10.5,
       "toc_section_leading": 13,
-      "toc_topic_size": 8.2,
+      "toc_topic_size": 8.8,
       "toc_topic_leading": 10.5,
       "toc_page_size": 7.1,
       "footer_size": 8.2,
@@ -229,15 +208,16 @@
       "page_number_size": 8.5,
       "rule_width": 0.75,
       "card_border_width": 0.5,
-      "link_underline_width": 0.75
+      "cover_label_size": 9,
+      "cover_brand_size": 20
     },
     "scalar": {
-      "cover_pattern_opacity": 0.18,
-      "cover_pattern_ratio": 0.9729947601773479,
       "toc_max_passes": 3,
       "minimum_page_digits": 2,
       "short_paragraph_lines": 3,
-      "minimum_split_lines": 2
+      "minimum_split_lines": 2,
+      "cover_overlay_opacity": 0.89,
+      "internal_motif_opacity": 0.1
     }
   },
   "content_version": "3.0.0",

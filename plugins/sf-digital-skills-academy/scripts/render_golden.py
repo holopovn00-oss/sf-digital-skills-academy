@@ -141,12 +141,7 @@ def draw_toc_entries(canvas, entries, structure, destinations, profile, service)
         boxes=[]
         for i,line in enumerate(entry["lines"]):
             top=entry["top"]+i*leading
-            boxes.append(service(line,text_x,top,size,"text" if is_heading else "brand",bold=is_heading))
-            if not is_heading:
-                canvas.setStrokeColor(HexColor(tokens["brand"]))
-                canvas.setLineWidth(.35)
-                underline_y=height-top-pdfmetrics.getAscent(FONT_NAME,size)-.8
-                canvas.line(text_x,underline_y,text_x+text_width(line,size),underline_y)
+            boxes.append(service(line,text_x,top,size,"text" if is_heading else "toc_topic",bold=is_heading))
         if not is_heading:
             target=destinations[entry["topic"]["topic_id"]]
             number="стр. "+str(target)
@@ -450,9 +445,13 @@ def render(lecture_path, out, *, composition_path=None, handoff_path=None, workf
         canvas.setFillColor(HexColor(tokens["canvas"]))
         canvas.rect(0,0,width,height,fill=1,stroke=0)
         if pattern:
-            image_asset("internal_pattern",mm["internal_pattern_x"]*MM,mm["internal_pattern_y"]*MM,
-                        mm["internal_pattern_width"]*MM,mm["internal_pattern_height"]*MM)
-        image_asset("internal_lockup",mm["internal_sf_x"]*MM,mm["internal_sf_y"]*MM,mm["internal_sf_width"]*MM)
+            canvas.saveState()
+            canvas.setFillAlpha(profile["layout_profile"]["scalar"]["internal_motif_opacity"])
+            image_asset("motif",mm["internal_motif_x"]*MM,mm["internal_motif_y"]*MM,
+                        mm["internal_motif_width"]*MM,mm["internal_motif_height"]*MM)
+            canvas.restoreState()
+        image_asset("logo",mm["internal_logo_x"]*MM,mm["internal_logo_y"]*MM,
+                    mm["internal_logo_width"]*MM)
         if section:
             sections=lecture["structure"]["sections"]
             index=next(i for i,s in enumerate(sections) if s["section_id"]==section)
@@ -480,26 +479,33 @@ def render(lecture_path, out, *, composition_path=None, handoff_path=None, workf
         number=str(current_number).zfill(profile["layout_profile"]["scalar"]["minimum_page_digits"])
         service(number,mm["content_right"]*MM-text_width(number,pt["page_number_size"]),y,pt["page_number_size"],"muted")
 
-    canvas.setFillColor(HexColor(tokens["brand"]))
+    canvas.setFillColor(HexColor(tokens["surface"]))
     canvas.rect(0,0,width,height,fill=1,stroke=0)
+    image_asset("cover_photo",mm["cover_photo_x"]*MM,mm["cover_photo_y"]*MM,
+                mm["cover_photo_width"]*MM,mm["cover_photo_height"]*MM)
     canvas.saveState()
-    canvas.setFillAlpha(profile["layout_profile"]["scalar"]["cover_pattern_opacity"])
-    image_asset("cover_pattern",0,0,width,height)
+    canvas.setFillAlpha(profile["layout_profile"]["scalar"]["cover_overlay_opacity"])
+    canvas.setFillColor(HexColor(tokens["surface"]))
+    canvas.rect(0,0,width,height-mm["cover_overlay_top"]*MM,fill=1,stroke=0)
     canvas.restoreState()
-    for name,x,w in (("partner_mincifry","mincifry_x","mincifry_width"),("partner_skolkovo","skolkovo_x","skolkovo_width"),
-                     ("cover_lockup","cover_sf_x","cover_sf_width")):
-        image_asset(name,mm[x]*MM,mm["cover_header_top"]*MM,mm[w]*MM)
+    image_asset("logo",mm["cover_logo_x"]*MM,mm["cover_logo_y"]*MM,
+                mm["cover_logo_width"]*MM)
     title=cover_title(lecture["title"], confirmed_ordinal=confirmed_ordinal)
     lines=wrap(title,mm["cover_title_width"]*MM,pt["cover_title_size"],bold_font)
     title_top=mm["cover_title_bottom"]*MM-len(lines)*pt["cover_title_leading"]
-    require(title_top > (mm["cover_header_top"]+mm["cover_header_height"]+mm["cover_label_gap"])*MM,
+    require(title_top > (mm["cover_overlay_top"]+mm["cover_label_gap"]+5)*MM,
             "Cover title exceeds available frame")
-    service("ЛЕКЦИОННЫЙ КОНСПЕКТ",mm["cover_title_x"]*MM,title_top-mm["cover_label_gap"]*MM,pt["small_label_size"],"#FFFFFF")
+    require(mm["cover_title_bottom"]+5 < mm["cover_bar_top"], "Cover title overlaps brand bar")
+    service("ЛЕКЦИОННЫЙ КОНСПЕКТ",mm["cover_title_x"]*MM,
+            title_top-mm["cover_label_gap"]*MM,pt["cover_label_size"],"brand")
     for i,line in enumerate(lines):
-        service(line,mm["cover_title_x"]*MM,title_top+i*pt["cover_title_leading"],pt["cover_title_size"],"#FFFFFF",bold=True)
-    canvas.setStrokeColor(HexColor("#FFFFFF"))
-    canvas.line(mm["cover_title_x"]*MM,height-mm["cover_rule_y"]*MM,
-                (mm["cover_title_x"]+mm["cover_rule_width"])*MM,height-mm["cover_rule_y"]*MM)
+        service(line,mm["cover_title_x"]*MM,title_top+i*pt["cover_title_leading"],
+                pt["cover_title_size"],"cover_text",bold=True)
+    canvas.setFillColor(HexColor(tokens["brand"]))
+    canvas.rect(0,height-(mm["cover_bar_top"]+mm["cover_bar_height"])*MM,
+                width,mm["cover_bar_height"]*MM,fill=1,stroke=0)
+    service("Digital Skills Academy",mm["cover_bar_text_x"]*MM,
+            mm["cover_bar_text_top"]*MM,pt["cover_brand_size"],"#FFFFFF",bold=True)
     canvas.showPage()
     for entries in toc_pages:
         current_number+=1
@@ -510,7 +516,7 @@ def render(lecture_path, out, *, composition_path=None, handoff_path=None, workf
         canvas.showPage()
     for page in pages:
         current_number+=1
-        internal(page["section_id"],pattern=not bool(page.get("section_title")))
+        internal(page["section_id"],pattern=current_number == 3 or not bool(page.get("section_title")))
         for i,line in enumerate(page.get("section_title",[])):
             service(line,style["x"][0],mm["topic_title_top"]*MM+i*pt["topic_title_leading"],
                     pt["topic_title_size"],bold=True)
@@ -554,7 +560,7 @@ def render(lecture_path, out, *, composition_path=None, handoff_path=None, workf
                 if data["time"]:
                     ph=bar["pill_height_mm"]*MM
                     pill=[right-data["pill_width"],rule_y-ph/2,right,rule_y+ph/2]
-                    canvas.setFillColor(HexColor(tokens["blue"]))
+                    canvas.setFillColor(HexColor(tokens["rose"]))
                     canvas.roundRect(pill[0],height-pill[3],data["pill_width"],ph,bar["pill_radius_mm"]*MM,fill=1,stroke=0)
                     asc=pdfmetrics.getAscent(FONT_NAME,data["size"])
                     desc=-pdfmetrics.getDescent(FONT_NAME,data["size"])
