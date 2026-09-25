@@ -1,0 +1,2 @@
+# Canonical dependencies ship inside the installable plugin.
+-r plugins/sf-digital-skills-academy/requirements.txt

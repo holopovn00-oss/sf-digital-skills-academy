@@ -1,1 +1,60 @@
 # SF Digital Skills Academy
+
+Плагин Codex для SF Education. Он превращает русскоязычный транскрипт в полный учебный текст JSON, проверяет отдельные утверждения по внешним источникам и собирает из выбранной редакции A4 PDF со смысловыми абзацами и формулами LaTeX.
+
+Текущая версия плагина: **0.1.0**.
+
+## Два режима работы
+
+1. **Полный цикл через \`sf-digital-skills-academy\`.** Материалы → принятый образец → полный учебный текст → фактчек → решения человека → новая выбранная редакция → PDF-кандидат по Golden Gate.
+2. **Прямой выбранный навык.** \`$sf-transcript-to-lecture\`, \`$sf-fact-check\` или \`$sf-lecture-to-golden-pdf\` выполняют только собственный этап и не переходят к следующему автоматически.
+
+В полном цикле PDF не создается, пока fact-check не связан с выбранной новой редакцией и не пройдет \`FULL_CYCLE_FACT_CHECK_GATE_VALIDATED\`. Решение «оставить» фиксирует исключение, но не превращает исходный claim в подтвержденный факт. Прямой PDF отмечается как \`DIRECT_SKILL_NO_FACT_CHECK_GATE\`: это отдельный режим без неявного фактчека.
+
+## Навыки
+
+| Навык | Вход | Результат |
+|---|---|---|
+| \`sf-digital-skills-academy\` | Материалы лекции | Полный цикл до PDF-кандидата с проверяемым fact-check gate |
+| \`sf-transcript-to-lecture\` | Полный транскрипт и исходные привязки | \`lecture-text.json\` с учебным текстом, LaTeX и редакторским отчетом |
+| \`sf-fact-check\` | Текст или \`lecture-text.json\` | \`fact-check.json\`, action-карточки и обработка решений |
+| \`sf-lecture-to-golden-pdf\` | Явно выбранный готовый текст или full-cycle handoff | A4 PDF, план размещения и технические проверки |
+
+## Что требует вашего решения
+
+Перед обработкой всей лекции примите один образец редактуры. Фактчек показывает только реальные ошибки и оговорки, меняющие учебный смысл; решения задаются адресно, например \`FC-001 — исправить\`. При неполном охвате фактчека PDF полного цикла требует отдельного принятия точно описанного ограничения.
+
+Автоматические проверки оценивают структуру, связанные хеши и механику PDF. Они не заменяют содержательную сверку, просмотр страниц и ручную приемку.
+
+## Подключение и проверка
+
+Устанавливайте текущую версию из ветки \`main\`. Для воспроизводимой установки закрепляйте SHA коммита. Порядок подключения и обновления описан в [инструкции по обновлению](docs/UPDATING.md).
+
+Для локальной структурной проверки из корня репозитория выполните:
+
+~~~powershell
+# Проверка ничего не скачивает и не устанавливает.
+python plugins/sf-digital-skills-academy/scripts/dependency_preflight.py --json
+
+# Только после явного подтверждения пользователя, если preflight вернул ACTION_REQUIRED:
+python plugins/sf-digital-skills-academy/scripts/dependency_preflight.py --install --approve-install --json
+
+python -m unittest discover -s tests -v
+~~~
+
+Python-пакеты перечислены в [requirements.txt](requirements.txt); Tectonic и его кэш — в [runtime-requirements.json](plugins/sf-digital-skills-academy/runtime-requirements.json). Tectonic не ставится через pip. Сценарий сначала использует встроенный runtime Codex и загружает закрепленный официальный бинарник с проверкой SHA-256 только после подтвержденной установки.
+
+Для изменений PDF-контура используйте [GitHub-gates](docs/GITHUB_GOVERNANCE.md). Полный PDF-релиз требует отдельной визуальной и ручной проверки.
+
+## Документация
+
+- [Общий сценарий работы](plugins/sf-digital-skills-academy/skills/sf-digital-skills-academy/SKILL.md)
+- [Контракт full-cycle handoff](plugins/sf-digital-skills-academy/skills/sf-digital-skills-academy/references/full-cycle-handoff-1.0.0.md)
+- [Правила фактчека и решений](plugins/sf-digital-skills-academy/skills/sf-fact-check/SKILL.md)
+- [Предъявление результатов фактчека](plugins/sf-digital-skills-academy/skills/sf-fact-check/references/human-review.md)
+- [Подготовка Golden Gate PDF](plugins/sf-digital-skills-academy/skills/sf-lecture-to-golden-pdf/SKILL.md)
+- [Автоматические проверки PDF](plugins/sf-digital-skills-academy/skills/sf-lecture-to-golden-pdf/references/automated-checks.md)
+- [Индекс документации](docs/README.md)
+- [Сведения о сторонних ресурсах](THIRD_PARTY_NOTICES.md)
+
+PDF-зависимости не блокируют текстовые этапы. Для PDF без формул preflight принимает `--no-math`. Python-пакеты устанавливаются в отдельное managed venv; команды сборки выполняются через `python.interpreter` из отчета. Полный рендерер: `plugins/sf-digital-skills-academy/scripts/render_golden.py`.

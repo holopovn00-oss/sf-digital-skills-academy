@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+output/
+tmp/
+*.log
+candidate-manifest.json
+accepted-manifest.json
+source-manifest.json
+text-review.json
+visual-review.json
+# Machine-local preferences, scoped only to SF Digital Skills Academy.
+/plugins/sf-digital-skills-academy/LOCAL_MEMORY.md
