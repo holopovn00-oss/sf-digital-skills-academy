@@ -1,8 +1,8 @@
-# Подключение SF Digital Skills Academy 0.1.0
+# Подключение Digital Skills Academy 0.1.0
 
 Текущая редакция находится в main этого репозитория. Для воспроизводимой установки фиксируйте полный SHA нужного коммита и проверяйте manifest плагина в нем. Исторические теги сохранены: тег v0.1.0, если он существует, не обязательно указывает на эту редакцию. Не переиспользуйте его без проверки назначения.
 
-В Codex откройте каталог плагинов и подключите репозиторий holopovn00-oss/sf-digital-skills-academy как marketplace, затем выберите SF Digital Skills Academy. Для CLI используйте команды, доступные в установленной версии: codex plugin marketplace --help и codex plugin --help. Репозиторий содержит .agents/plugins/marketplace.json с именем sf-digital-skills-academy и путь ./plugins/sf-digital-skills-academy.
+В Codex откройте каталог плагинов и подключите репозиторий holopovn00-oss/sf-digital-skills-academy как marketplace, затем выберите Digital Skills Academy. Для CLI используйте команды, доступные в установленной версии: codex plugin marketplace --help и codex plugin --help. Репозиторий содержит .agents/plugins/marketplace.json с именем sf-digital-skills-academy и путь ./plugins/sf-digital-skills-academy.
 
 Обновление GitHub не переустанавливает локальный плагин автоматически. Обновление marketplace, переустановка, очистка кеша и изменения локальных конфигураций выполняются только по отдельному запросу. После разрешенного обновления проверьте фактическую версию 0.1.0 в установленном .codex-plugin/plugin.json и откройте новую задачу; старая задача может сохранять прежние инструкции.
 

@@ -33,6 +33,9 @@ class PluginMetadataChecks(unittest.TestCase):
 
     def test_general_metadata_matches_the_two_mode_workflow(self):
         manifest = json.loads((ROOT / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["interface"]["displayName"], "Digital Skills Academy")
+        self.assertEqual(manifest["interface"]["brandColor"], "#BD0C1E")
+        self.assertTrue((ROOT / manifest["interface"]["logo"].removeprefix("./")).is_file())
         description = manifest["description"].lower()
         self.assertIn("полный цикл", description)
         self.assertIn("прямые навыки", description)
@@ -55,6 +58,7 @@ class PluginMetadataChecks(unittest.TestCase):
 
     def test_marketplace_entry_resolves_to_the_only_manifest(self):
         marketplace = json.loads((REPO / ".agents/plugins/marketplace.json").read_text(encoding="utf-8"))
+        self.assertEqual(marketplace["interface"]["displayName"], "Digital Skills Academy")
         entries = marketplace["plugins"]
         self.assertEqual(len(entries), 1)
         entry = entries[0]

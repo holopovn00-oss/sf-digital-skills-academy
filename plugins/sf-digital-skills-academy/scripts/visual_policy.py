@@ -8,12 +8,15 @@ SERVICE = re.compile(r'\bFC-\d+\b|ниже дана правильная зап�
 # Only the explicitly marked source-name field is normalized, not teaching text.
 SOURCE_NAME = re.compile(r'(?:^|\n)(Источник[ \t]*:[ \t]*)(.*?)(?=\s*→|\n(?:Слайд[ \t]+№|Тема[ \t]*:)|\Z)', re.I | re.S)
 CAPTION_FIELD = re.compile(r'^(Источник[ \t]*:|Слайд[ \t]+№[ \t]*:?|Тема[ \t]*:)[ \t]*', re.M)
+VIDEO_LABEL = re.compile(r'(?m)^\s*Видео(?:\s+\d+)?\s*:')
 
 
 def caption_fields(text, blank_authorization=None):
     """Three ordered fields, each on a new line; wrapping inside a field is allowed."""
     if not isinstance(text, str):
         raise ValueError('Caption must be text')
+    if VIDEO_LABEL.search(text):
+        raise ValueError('Video label is not allowed inside a visual caption')
     authorized = isinstance(blank_authorization, str) and bool(blank_authorization.strip())
     if not text.strip():
         if authorized:

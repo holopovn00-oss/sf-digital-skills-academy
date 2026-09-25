@@ -78,5 +78,20 @@
       "sha256": "85A25E910C1C32A155A43F0F3792243EF555F5E4CE70383969A1E745EEA70EB8"
     }
   ],
-  "source_path_basis": "Relative to the original SF-Lecture-Publisher installation; historical provenance, not a runtime dependency."
+  "source_path_basis": "Relative to the original SF-Lecture-Publisher installation; historical provenance, not a runtime dependency.",
+  "current_golden": {
+    "file": "assets/golden/golden.pdf",
+    "sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+    "pages": 28,
+    "brand": "Digital Skills Academy"
+  },
+  "current_brand_source": {
+    "presentation": "1.pptx",
+    "presentation_sha256": "A17EB80E7CBACA6A030EDC4FC986A89142C926C67A1CC84C40D21D3059C5E71E",
+    "assets": {
+      "assets/a4/digital-skills-academy-cover.jpeg": "633243B6031CFFAA35DBFC3F5B57BDD8DBDC1DC1A02F70E3858BAF2251C026F4",
+      "assets/a4/digital-skills-academy-logo.png": "AD1825FE30123FECF6ACD08F012919EDBF5D5825062B3F2A56FA4A0511D82607",
+      "assets/a4/digital-skills-academy-motif.png": "86325BDA49D3731FD779A213602A0316918B4520988F94B3D2770F909838064C"
+    }
+  }
 }

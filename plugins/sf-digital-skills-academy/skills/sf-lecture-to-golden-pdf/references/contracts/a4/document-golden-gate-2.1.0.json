@@ -1,7 +1,7 @@
 {
   "$id": "https://sf.education/sf-digital-skills-academy/contracts/a4/2.1.0",
   "schema_version": "2.1.0",
-  "source_golden_sha256": "9CF366F4D6341248BF1F502994316D9661617E54A896397BA754C33A071651EC",
+  "source_golden_sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
   "rights_status": "CONFIRMED",
   "requirements": "A33-A45 and M01-M20 retained where compatible; approved study-guide, paragraph and LaTeX requirements 2026-09-12",
   "cover_title": {
@@ -85,12 +85,7 @@
     "width_mm": 3.4,
     "bottom_margin_mm": 15,
     "cycle": [
-      "blue",
-      "amber",
-      "mint",
-      "lilac",
-      "peach",
-      "aqua"
+      "rose"
     ]
   },
   "keep_rules": {
@@ -110,8 +105,8 @@
     "full_topic_names": true,
     "section_groups": "whole-if-fit-otherwise-repeat-heading",
     "contents_style": {
-      "section": "white-two-digit-number-in-blue-circle-black-bold-title-gray-divider-below",
-      "topic": "blue-dot-blue-underlined-internal-link-hanging-continuation",
+      "section": "white-two-digit-number-in-red-circle-black-bold-title-gray-divider-below",
+      "topic": "red-dot-graphite-ununderlined-internal-link-hanging-continuation",
       "page_label": "стр. N",
       "page_label_placement": "gray-right-aligned-top-line-topic-only-measured-width",
       "last_page_balance": "best-legal-whole-group-split-preserve-order",
@@ -150,8 +145,8 @@
       29
     ],
     "cover": [
-      44,
-      46
+      39,
+      47
     ],
     "caption": [
       7.75,
@@ -162,7 +157,7 @@
       13
     ],
     "toc_topic": [
-      8.2,
+      8.8,
       10.5
     ],
     "section_label": [
@@ -182,11 +177,10 @@
     "fit": "contain-no-crop",
     "padding_mm": 3,
     "image_caption_gap_mm": 3,
-    "caption_video_gap_mm": 2,
     "following_gap_mm": 5,
     "border_pt": 0.5,
     "radius_mm": 2.3,
-    "video_time": "verified-decoded-frame-time-only-never-transcript-range"
+    "video_time": "separate-topic-divider-only-never-in-caption"
   },
   "tolerances": {
     "page_mm": 0.05,
@@ -196,37 +190,6 @@
     "text_loss": 0,
     "text_duplication": 0,
     "unreviewed_pages": 0
-  },
-  "pattern_extraction": {
-    "source_sha256": "0188F5614446EEBAD7ED5A1CCD54448B8B27E3E99B8242B85BAC1BD0501DA949",
-    "cover": {
-      "xref": 8,
-      "size": [
-        2481,
-        2414
-      ],
-      "alpha_max": 26,
-      "additional_opacity": 0.18
-    },
-    "internal": {
-      "page": 4,
-      "graphics_state": "G56",
-      "bbox_mm": [
-        127.469,
-        168.323,
-        117.83008429981356,
-        159.34750164153044
-      ],
-      "opacity_baked": 0.1,
-      "size": [
-        1392,
-        1883
-      ]
-    },
-    "assets": {
-      "cover-pattern.png": "DEADAF51B588EC5A6311C5118A5308E7E3964328D31B2658E8D0337DCCBB97A0",
-      "internal-pattern.png": "FDBF71ABA7D5134876DCEEFABEE3081C7472D34ACF875FDA999E2E828B659464"
-    }
   },
   "math": {
     "source_format": "latex",
@@ -238,5 +201,14 @@
     "overflow": "explicit-aligned-expression-or-blocker",
     "no_scaling": true,
     "compiled_asset_padding_pt": 2
+  },
+  "brand_assets": {
+    "source": "user-supplied Digital Skills Academy presentations",
+    "public_assets": {
+      "digital-skills-academy-cover.jpeg": "633243B6031CFFAA35DBFC3F5B57BDD8DBDC1DC1A02F70E3858BAF2251C026F4",
+      "digital-skills-academy-logo.png": "AD1825FE30123FECF6ACD08F012919EDBF5D5825062B3F2A56FA4A0511D82607",
+      "digital-skills-academy-motif.png": "86325BDA49D3731FD779A213602A0316918B4520988F94B3D2770F909838064C"
+    },
+    "slide_content": "preserve-source-content; branded source-slide changes are limited to the pinned Golden exemplar"
   }
 }
