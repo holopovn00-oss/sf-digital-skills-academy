@@ -22,7 +22,7 @@
   "powerpoint_runtime": false,
   "rights_status": "CONFIRMED",
   "document_grammar_contract": "contracts/a4/document-golden-gate-2.1.0.json",
-  "document_grammar_sha256": "BDBFD4A57FF47E93253B93ECB639FD39DC029E2898A848C02BBFB88B8888B015",
+  "document_grammar_sha256": "DAD081E0651EDDB0CC98FECBB9BFEF5A06A8F59CA787866735843CA1919F7C34",
   "font": {
     "family": "Inter",
     "delivery": "external-verified",
