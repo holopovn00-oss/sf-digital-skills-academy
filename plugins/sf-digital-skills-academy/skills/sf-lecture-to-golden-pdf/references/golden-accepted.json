@@ -1,0 +1,33 @@
+{
+  "schema_version": "golden-acceptance/1.0",
+  "accepted_on": "2026-09-26",
+  "user_decision": "Selected graphite, agreed to omit underlines, and authorized GitHub work on the stated v11 plan.",
+  "acceptance_scope": "Design choices and GitHub transfer of the displayed v11 reference are authorized; a separate full-document manual acceptance is not claimed.",
+  "manual_full_document_review": false,
+  "version": "0.1.0",
+  "pdf": "../assets/golden/golden.pdf",
+  "sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+  "pages": 28,
+  "profile": "adapters/a4/2.1.0.json",
+  "profile_sha256": "890490920FABC94F274174264116F7B645912462B733F96D677772D85A304946",
+  "contract": "contracts/a4/document-golden-gate-2.1.0.json",
+  "contract_sha256": "9B069B7362285F372493252AC7BA3101269F9767564C9185D5DE75DEFF2E36B3",
+  "targeted_checks": {
+    "A4_pages": 28,
+    "toc_topic_links": 32,
+    "toc_graphite_lines_at_8_8_pt": 40,
+    "toc_underlines": 0,
+    "bookmarks": 39,
+    "figure_captions_with_three_fields": 17,
+    "in_card_video_lines": 0
+  },
+  "visual_review": {
+    "reviewer": "current_agent",
+    "independent": false,
+    "pages_reviewed_at_full_size": [
+      2
+    ],
+    "result": "Graphite contents reviewed; a new full-document manual review is not claimed."
+  },
+  "standard_validator": "NOT_CERTIFIED: this pinned multi-zone example has not passed the standard candidate validator."
+}

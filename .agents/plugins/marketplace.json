@@ -1,0 +1,20 @@
+{
+  "name": "sf-digital-skills-academy",
+  "interface": {
+    "displayName": "Digital Skills Academy"
+  },
+  "plugins": [
+    {
+      "name": "sf-digital-skills-academy",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sf-digital-skills-academy"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

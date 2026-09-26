@@ -1,0 +1,214 @@
+{
+  "$id": "https://sf.education/sf-digital-skills-academy/contracts/a4/2.1.0",
+  "schema_version": "2.1.0",
+  "source_golden_sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+  "rights_status": "CONFIRMED",
+  "requirements": "A33-A45 and M01-M20 retained where compatible; approved study-guide, paragraph and LaTeX requirements 2026-09-12",
+  "cover_title": {
+    "approved_on": "2026-09-17",
+    "lesson_ordinal": "omit-including-source-title-file-or-folder-prefix",
+    "semantic_title": "preserve-including-meaningful-numbers",
+    "ambiguous_number": "request-clarification",
+    "source_provenance": "preserve-original-title-and-ordinal",
+    "scope": "cover-only-no-file-renaming-or-other-numbering-changes"
+  },
+  "visual_flow": "visual-first-full-width",
+  "topic_visual_policy": {
+    "source_order": "preserved",
+    "synthetic_replacement": "forbidden",
+    "visual_block_prose": "printed-exactly-once-below-own-source-card",
+    "continuation": "no-repeated-visual"
+  },
+  "short_topic_layout": "two-column",
+  "long_topic_layout": "two-column",
+  "section_boundary_policy": "never-mix-sections",
+  "section_visual_separation": {
+    "major_chapters": "hierarchical-headings-and-controlled-spacing",
+    "main_semantic_blocks": "visible-heading-and-controlled-spacing",
+    "blank_subtopic_divider_pages": "not-required"
+  },
+  "topic_character_limit": "unbounded",
+  "pagination": {
+    "measurement": "Inter-glyph-width-and-compiled-LaTeX-boxes",
+    "same_topic_flow": "unbounded-across-pages",
+    "fragment_boundary": "typed-paragraph-runs-and-indivisible-math",
+    "reconstruction": "ordered-text-run-ranges-and-exact-LaTeX-occurrences",
+    "new_topic_and_visual": "continue-in-available-space-unless-keep-or-fit-requires-break",
+    "subtopic_sequence": "source-order-with-related-paragraphs-no-forced-page-break",
+    "heading_keep": "with-at-least-two-body-lines-or-first-indivisible-content-element",
+    "print_compactness": "reduce-avoidable-whitespace-and-breaks-without-content-or-readability-loss",
+    "unfilled_space": "check-next-block-fit-and-record-required-break-reason",
+    "continuous_subtopics_implementation": "FULL_WIDTH_TOPIC_BAR_AND_MEASURED_TWO_COLUMN_ZONES",
+    "heading_continuation": "repeat-section-only-no-topic-title",
+    "continuation_content_top": {
+      "basis": "max-visible-section-label-and-logo-bottom",
+      "gap_layout_key": "heading_gap",
+      "topic_title_space_reserved": false,
+      "content_top_min_applies": "first-topic-page-only"
+    }
+  },
+  "columns": {
+    "text_alignment": "justify-last-paragraph-line-left",
+    "top_alignment": "common-first-visible-content-edge-no-initial-heading-gap",
+    "justification_method": "word-spaces-only-no-letter-scaling",
+    "excessive_spacing": "mechanical-hard-limit-and-visual-QA-no-letter-scaling",
+    "russian_hyphenation": "dictionary-approved-layout-only-preserve-source-ranges",
+    "word_space_ratio_limits": [
+      0.7,
+      3
+    ],
+    "content_x_mm": 22,
+    "content_width_mm": 174,
+    "column_width_mm": 84,
+    "column_gap_mm": 6,
+    "reading_order": "within-content-zone-left-column-then-right-follow-source-order",
+    "bottom_mm": 272,
+    "paragraph_extra_gap_mm": 0,
+    "display_math_extra_gap_mm": 4,
+    "paragraph_start": {
+      "approved_on": "2026-09-17",
+      "style": "uniform-first-line-indent",
+      "first_line_indent_mm": 5,
+      "indent_size_status": "USER_CONFIRMED",
+      "blank_separator_lines": "forbidden",
+      "source_text_padding": "forbidden-use-layout-not-tabs-or-spaces",
+      "continuation_indent_mm": 0,
+      "scope": "body-text-paragraphs-only",
+      "implementation_status": "PROFILE_RENDERER_AND_CHECKER_ALIGNED"
+    },
+    "flow_boundary": "physical-content-zone-not-each-topic-id-preserve-semantic-links",
+    "balance": "best-legal-split-per-physical-zone-between-full-width-bars-or-cards"
+  },
+  "rail": {
+    "x_mm": 14,
+    "top_mm": 14,
+    "width_mm": 3.4,
+    "bottom_margin_mm": 15,
+    "cycle": [
+      "rose"
+    ]
+  },
+  "keep_rules": {
+    "short_paragraph_lines": 3,
+    "minimum_widow_lines": 2,
+    "minimum_orphan_lines": 2,
+    "card": "whole",
+    "timestamp": "with-first-lines"
+  },
+  "navigation": {
+    "contents_columns": 2,
+    "column_width_mm": 87,
+    "gap_mm": 8,
+    "margin_mm": 14,
+    "top_mm": 33.3,
+    "bottom_mm": 283,
+    "full_topic_names": true,
+    "section_groups": "whole-if-fit-otherwise-repeat-heading",
+    "contents_style": {
+      "section": "white-two-digit-number-in-red-circle-black-bold-title-gray-divider-below",
+      "topic": "red-dot-graphite-ununderlined-internal-link-hanging-continuation",
+      "page_label": "стр. N",
+      "page_label_placement": "gray-right-aligned-top-line-topic-only-measured-width",
+      "last_page_balance": "best-legal-whole-group-split-preserve-order",
+      "background": "plain-canvas-no-rail-no-pattern",
+      "reference_content": "never-copy-topic-count-titles-or-page-numbers"
+    },
+    "fixed_point_max_passes": 3,
+    "physical_page_numbers": true,
+    "footer_top_mm": 278,
+    "footer_rule_mm": 274,
+    "minimum_page_number_digits": 2
+  },
+  "timestamp_dividers": {
+    "pill_height_mm": 5,
+    "pill_radius_mm": 2.5,
+    "pill_padding_mm": 2.5,
+    "right_edge_mm": 196,
+    "text_gap_mm": 1,
+    "line_width_pt": 0.75,
+    "layout": "title-left-rule-middle-time-pill-right-full-content-width",
+    "title_size_pt": 11,
+    "title_leading_pt": 14,
+    "long_title": "wrap-without-font-reduction",
+    "line_clearance_mm": 3,
+    "title_time_reserved_gap_mm": 8,
+    "missing_time": "omit-pill-never-invent",
+    "keep_with_body_lines": 2
+  },
+  "typography": {
+    "body": [
+      9.5,
+      13.1
+    ],
+    "topic": [
+      26,
+      29
+    ],
+    "cover": [
+      39,
+      47
+    ],
+    "caption": [
+      7.75,
+      10.5
+    ],
+    "toc_section": [
+      10.5,
+      13
+    ],
+    "toc_topic": [
+      8.8,
+      10.5
+    ],
+    "section_label": [
+      7.75,
+      10.5
+    ],
+    "footer": 8.2,
+    "page_number": 8.5
+  },
+  "card": {
+    "width_mm": 141.55,
+    "max_width_mm": 149.49,
+    "image_max_mm": [
+      135.47,
+      91.02
+    ],
+    "fit": "contain-no-crop",
+    "padding_mm": 3,
+    "image_caption_gap_mm": 3,
+    "following_gap_mm": 5,
+    "border_pt": 0.5,
+    "radius_mm": 2.3,
+    "video_time": "separate-topic-divider-only-never-in-caption"
+  },
+  "tolerances": {
+    "page_mm": 0.05,
+    "geometry_mm": 0.2,
+    "font_pt": 0.05,
+    "leading_pt": 0.05,
+    "text_loss": 0,
+    "text_duplication": 0,
+    "unreviewed_pages": 0
+  },
+  "math": {
+    "source_format": "latex",
+    "renderer": "tectonic",
+    "output": "embedded-vector-PDF",
+    "size_basis": "body_size",
+    "inline_baseline": "TeX-box-ascent",
+    "display_alignment": "center-in-column",
+    "overflow": "explicit-aligned-expression-or-blocker",
+    "no_scaling": true,
+    "compiled_asset_padding_pt": 2
+  },
+  "brand_assets": {
+    "source": "user-supplied Digital Skills Academy presentations",
+    "public_assets": {
+      "digital-skills-academy-cover.jpeg": "633243B6031CFFAA35DBFC3F5B57BDD8DBDC1DC1A02F70E3858BAF2251C026F4",
+      "digital-skills-academy-logo.png": "AD1825FE30123FECF6ACD08F012919EDBF5D5825062B3F2A56FA4A0511D82607",
+      "digital-skills-academy-motif.png": "86325BDA49D3731FD779A213602A0316918B4520988F94B3D2770F909838064C"
+    },
+    "slide_content": "preserve-source-content; branded source-slide changes are limited to the pinned Golden exemplar"
+  }
+}

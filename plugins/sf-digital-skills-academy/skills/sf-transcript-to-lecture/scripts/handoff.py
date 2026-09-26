@@ -1,0 +1,403 @@
+"""Build and verify JSON-only SF LectureText 3.0.0 packages.
+
+Python standard library only. No SF Publisher imports or controller operations.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts"))
+from lecture_content import VERSION, block_text, validate_content
+
+
+SOURCE_DEFAULTS = {"substantive": True, "source_uri": None, "start_ms": None,
+                   "end_ms": None, "page": None, "slide": None, "locator": None}
+PLACEMENT_DEFAULTS = {"role": "paragraph", "timestamp_range": None,
+                      "source_page": None, "source_slide": None,
+                      "visual_path": None, "visual_sha256": None, "caption": None,
+                      "visual_kind": None, "keep_together": False}
+DRAFT_FIELDS = {"folder_id", "title", "blocks", "transformation_ledger", "structure"}
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def nonempty(value):
+    return isinstance(value, str) and bool(value.strip())
+
+
+def digest(value):
+    raw = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest().upper()
+
+
+def read_json(path):
+    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+
+
+def unique(rows, key):
+    require(isinstance(rows, list) and bool(rows), f"{key}: expected nonempty array")
+    ids = [row.get(key) for row in rows]
+    require(all(nonempty(item) for item in ids), f"{key}: empty identifier")
+    require(len(set(ids)) == len(ids), f"{key}: duplicate identifier")
+    return ids
+
+
+def normalize_sources(rows):
+    require(isinstance(rows, list) and bool(rows), "No source blocks")
+    result = []
+    for raw in rows:
+        require(isinstance(raw, dict), "Source block must be an object")
+        require({"source_block_id", "text"} <= raw.keys(), "Incomplete source block")
+        require(not raw.keys() - (SOURCE_DEFAULTS.keys() | {"source_block_id", "text"}),
+                "Unknown source fields")
+        item = {**SOURCE_DEFAULTS, **raw}
+        require(nonempty(item["text"]), "Empty source text")
+        require(type(item["substantive"]) is bool, "substantive must be Boolean")
+        for name in ("start_ms", "end_ms", "page", "slide"):
+            value = item[name]
+            require(value is None or (type(value) is int and value >= (1 if name in {"page", "slide"} else 0)),
+                    f"Invalid source {name}")
+        if item["end_ms"] is not None:
+            require(item["start_ms"] is not None and item["end_ms"] >= item["start_ms"],
+                    "Invalid time range")
+        require(any(nonempty(item[key]) for key in ("source_uri", "locator")),
+                "Source needs source_uri or a verifiable locator")
+        result.append(item)
+    unique(result, "source_block_id")
+    return result
+
+
+def normalize_structure(raw, block_ids):
+    require(isinstance(raw, dict) and set(raw) == {"sections", "topics", "placements"},
+            "Invalid lecture structure")
+    structure = json.loads(json.dumps(raw))
+    sections = structure["sections"]
+    topics = structure["topics"]
+    section_ids = unique(sections, "section_id")
+    topic_ids = unique(topics, "topic_id")
+    for row in sections:
+        require(set(row) == {"section_id", "number", "title"} and
+                nonempty(row["number"]) and nonempty(row["title"]), "Invalid section")
+    for row in topics:
+        require(set(row) == {"topic_id", "section_id", "title"} and
+                row["section_id"] in section_ids and nonempty(row["title"]), "Invalid topic")
+    required = {"text_block_id", "section_id", "topic_id"}
+    placements = structure["placements"]
+    require(unique(placements, "text_block_id") == block_ids,
+            "Placements must reference every text block exactly once in order")
+    by_topic = {row["topic_id"]: row for row in topics}
+    for row in placements:
+        require(required <= row.keys() and not row.keys() - (required | PLACEMENT_DEFAULTS.keys()),
+                "Unknown or incomplete placement")
+        for key, value in PLACEMENT_DEFAULTS.items():
+            row.setdefault(key, value)
+        require(row["topic_id"] in by_topic and row["section_id"] == by_topic[row["topic_id"]]["section_id"],
+                "Placement refers to an unknown or mismatched topic/section")
+        require(row["role"] in {"paragraph", "callout", "summary"}, "Text stage cannot introduce visuals")
+        require(all(row[key] is None for key in ("visual_path", "visual_sha256", "caption", "visual_kind")),
+                "Visual selection belongs to the PDF stage")
+        require(type(row["keep_together"]) is bool, "keep_together must be Boolean")
+        stamp = row["timestamp_range"]
+        require(stamp is None or (isinstance(stamp, str) and re.fullmatch(
+            r"\d{2}:\d{2}:\d{2}(?:\.\d{3})?\s*[-–—]\s*\d{2}:\d{2}:\d{2}(?:\.\d{3})?", stamp)),
+            "Invalid timestamp_range; leave unknown time null")
+    # Topics and sections must form contiguous groups in the declared order.
+    for key, expected in (("topic_id", topic_ids), ("section_id", section_ids)):
+        groups = []
+        for row in placements:
+            if not groups or groups[-1] != row[key]:
+                groups.append(row[key])
+        require(groups == expected, f"Noncontiguous, reordered or empty {key} groups")
+    return structure
+
+
+def build(source_rows, draft):
+    """Build the current typed format. Editing and substantive review are external."""
+    sources = normalize_sources(source_rows)
+    require(isinstance(draft, dict) and set(draft) == DRAFT_FIELDS | {"schema_version"}
+            and draft["schema_version"] == VERSION, "New drafts require schema_version 3.0.0 and typed content")
+    require(nonempty(draft["folder_id"]) and nonempty(draft["title"]), "Missing folder ID or exact title")
+    blocks = json.loads(json.dumps(draft["blocks"]))
+    block_ids = unique(blocks, "text_block_id")
+    anchored = []
+    for block in blocks:
+        anchors = block.get("source_block_ids")
+        require(isinstance(anchors, list) and anchors and all(nonempty(a) for a in anchors), "Missing source anchors")
+        anchored.extend(anchors)
+    validate_content(blocks)
+    by_source = {row["source_block_id"]: row for row in sources}
+    require(all(a in by_source for a in anchored), "Unknown source anchor")
+    require(len(set(anchored)) == len(anchored), "Duplicate source anchor")
+    ledger = draft["transformation_ledger"]
+    require(isinstance(ledger, list), "Invalid transformation ledger")
+    removed, spans = set(), {}
+    for row in ledger:
+        require(isinstance(row, dict), "Invalid transformation entry")
+        anchor = row.get("source_block_id")
+        require(anchor in by_source and nonempty(row.get("reason")), "Unknown or unjustified transformation")
+        if row.get("disposition") == "removed_nonsemantic":
+            require(set(row) == {"source_block_id", "disposition", "reason"} and anchor not in removed,
+                    "Invalid or repeated whole-block removal")
+            require(by_source[anchor]["substantive"] is False, "Cannot remove substantive content")
+            removed.add(anchor)
+        else:
+            require(row.get("disposition") == "removed_nonsemantic_span"
+                    and set(row) == {"source_block_id", "disposition", "start", "end", "quote", "reason"},
+                    "Invalid partial transformation")
+            start, end, text = row["start"], row["end"], by_source[anchor]["text"]
+            require(type(start) is int and type(end) is int and 0 <= start < end <= len(text)
+                    and text[start:end] == row["quote"] and row["quote"].strip(), "Partial removal differs from source quote")
+            require(anchor in anchored, "A partial removal needs the retained source block")
+            spans.setdefault(anchor, []).append((start, end))
+    require(not set(anchored) & removed, "Source both included and removed")
+    require(anchored == [s["source_block_id"] for s in sources if s["source_block_id"] not in removed],
+            "Missing, repeated, or reordered source blocks")
+    for anchor, ranges in spans.items():
+        ranges.sort()
+        require(all(a[1] <= b[0] for a, b in zip(ranges, ranges[1:])), "Overlapping partial removals")
+        text, previous, kept = by_source[anchor]["text"], 0, []
+        for start, end in ranges:
+            kept.append(text[previous:start])
+            previous = end
+        kept.append(text[previous:])
+        require("".join(kept).strip(), "Partial removals cannot erase the entire source block")
+    structure = normalize_structure(draft["structure"], block_ids)
+    locators = {b["text_block_id"]: [
+        {key: value for key, value in by_source[a].items() if key not in {"text", "substantive"}}
+        for a in b["source_block_ids"]] for b in blocks}
+    for placement in structure["placements"]:
+        group = locators[placement["text_block_id"]]
+        stamp = None
+        if len({a["source_uri"] for a in group}) == 1 and group[0]["start_ms"] is not None and group[-1]["end_ms"] is not None:
+            require(group[-1]["end_ms"] >= group[0]["start_ms"], "Reversed grouped source interval")
+            stamp = time_label(group[0]["start_ms"]) + " — " + time_label(group[-1]["end_ms"])
+        require(placement["timestamp_range"] in (None, stamp), "Grouped timestamp differs from actual source boundaries")
+        placement["timestamp_range"] = stamp
+    document = {"schema_version": VERSION, "folder_id": draft["folder_id"], "title": draft["title"],
+                "editorial_mode": "study_guide", "source_blocks_hash": digest(sources),
+                "blocks": blocks, "transformation_ledger": json.loads(json.dumps(ledger)),
+                "assertions": {"complete_source_accounting": True, "semantic_review_required": True},
+                "structure": structure, "source_locators": locators}
+    document["content_hash"] = digest(document)
+    return document, sources
+
+
+def validate_lecture(document):
+    """Check the current sealed content without claiming to have the transcript."""
+    required = DRAFT_FIELDS | {"schema_version", "editorial_mode", "source_blocks_hash", "assertions",
+                              "source_locators", "content_hash"}
+    require(isinstance(document, dict) and set(document) == required and document["schema_version"] == VERSION,
+            "Invalid current LectureText fields or version")
+    require(document["editorial_mode"] == "study_guide"
+            and document["assertions"] == {"complete_source_accounting": True, "semantic_review_required": True},
+            "Invalid editorial mode or assertions")
+    require(nonempty(document["title"]) and nonempty(document["folder_id"]), "Missing title or folder ID")
+    require(re.fullmatch(r"[A-F0-9]{64}", document["source_blocks_hash"] or ""), "Invalid source blocks hash")
+    require(document["content_hash"] == digest({k: v for k, v in document.items() if k != "content_hash"}),
+            "Lecture content hash differs")
+    identifiers = unique(document["blocks"], "text_block_id")
+    formulas = validate_content(document["blocks"])
+    require(normalize_structure(document["structure"], identifiers) == document["structure"], "Unsealed lecture structure")
+    require(set(document["source_locators"]) == set(identifiers), "Incomplete source locator keys")
+    for block in document["blocks"]:
+        locators = document["source_locators"][block["text_block_id"]]
+        require(isinstance(locators, list) and [a.get("source_block_id") for a in locators] == block["source_block_ids"],
+                "Source locators differ from block anchors")
+    return formulas
+
+
+def check(sources, document):
+    require(isinstance(document, dict), "Lecture text must be an object")
+    validate_lecture(document)
+    draft = {key: document[key] for key in DRAFT_FIELDS | {"schema_version"}}
+    rebuilt, _ = build(sources, draft)
+    require(rebuilt == document, "Sealed handoff differs from source, structure, or content hash")
+    return {"status": "STRUCTURE_VALIDATED", "schema_version": VERSION, "source_blocks": len(sources),
+            "text_blocks": len(document["blocks"]), "formulas": len(validate_content(document["blocks"])),
+            "content_hash": document["content_hash"], "semantic_review": "NOT_EVALUATED_BY_SCRIPT"}
+
+
+def time_label(milliseconds):
+    seconds, ms = divmod(milliseconds, 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}" + (f".{ms:03}" if ms else "")
+
+
+def write_package(target, sources, document):
+    target = Path(target)
+    target.mkdir(parents=True, exist_ok=False)
+    for name, value in (("source-blocks.json", sources), ("lecture-text.json", document)):
+        (target / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def checked_file(record):
+    require(isinstance(record, dict) and nonempty(record.get("path")), "Missing file reference")
+    path = Path(record["path"])
+    require(path.is_absolute(), "File references must be absolute")
+    expected = record.get("sha256")
+    require(isinstance(expected, str) and re.fullmatch(r"[0-9A-Fa-f]{64}", expected), "Invalid file SHA-256")
+    require(path.is_file(), f"Missing file: {path}")
+    require(hashlib.sha256(path.read_bytes()).hexdigest().upper() == expected.upper(), f"Changed file: {path}")
+    return path.resolve()
+
+
+def decision_rows(rows, document, source_ids):
+    require(isinstance(rows, list), "decisions must be an array")
+    indexed = {}
+    blocks = {b["text_block_id"]: block_text(b) for b in document["blocks"]}
+    formulas = validate_content(document["blocks"])
+    pending = []
+    for row in rows:
+        require(isinstance(row, dict) and nonempty(row.get("id")), "Invalid decision")
+        require(row["id"] not in indexed, "Duplicate decision ID")
+        require(row.get("decision") in {"proposed", "correct", "keep"}, "Unknown decision state")
+        require(row.get("execution") in {"pending", "applied", "verified"}, "Unknown execution state")
+        require(nonempty(row.get("basis")), "Decision requires its recorded basis")
+        anchors = row.get("source_block_ids")
+        require(isinstance(anchors, list) and all(a in source_ids for a in anchors), "Decision has unknown source IDs")
+        targets = row.get("targets")
+        require(isinstance(targets, list) and bool(targets), "Decision requires targets")
+        if row["decision"] == "proposed":
+            require(row["execution"] == "pending", "A proposal cannot be recorded as applied")
+        if row["execution"] == "pending":
+            pending.append(row["id"])
+        elif row["decision"] == "keep":
+            require(row["execution"] == "verified", "A keep decision must be verified")
+        elif row["decision"] == "correct":
+            require(row["execution"] == "applied", "A correction must be applied")
+        for target in targets:
+            layer = target.get("layer")
+            require(layer in {"text", "title", "formula"}, "Decision layer must be text, title or formula")
+            if layer == "text":
+                require(target.get("id") in blocks, "Decision target no longer exists")
+                value = blocks[target["id"]]
+            elif layer == "formula":
+                require(target.get("id") in formulas, "Formula decision target no longer exists")
+                value = formulas[target["id"]]["latex"]
+            else:
+                value = document["title"]
+            require(nonempty(target.get("expected")) and type(target.get("count")) is int and target["count"] >= 1,
+                    "Decision requires protected text and positive occurrence count")
+            if row["execution"] != "pending":
+                require(value.count(target["expected"]) == target["count"], f"Decision not preserved: {row['id']}")
+        indexed[row["id"]] = row
+    return indexed, pending
+
+
+def check_package(review_path, previous_review=None):
+    """Read-only checks. Recorded human review/authority are not authenticated."""
+    review_path = Path(review_path)
+    review = read_json(review_path)
+    version = review.get("schema_version")
+    require(version == "2.0", "Unsupported text review format")
+    artifacts = review.get("artifacts")
+    expected = {"sources", "lecture", "source_manifest"}
+    require(isinstance(artifacts, dict) and set(artifacts) == expected,
+            "Incomplete text package artifacts")
+    files = {key: checked_file(value) for key, value in artifacts.items()}
+    sources, document = read_json(files["sources"]), read_json(files["lecture"])
+    receipt = check(sources, document)
+    require(document["schema_version"] == VERSION, "Current review requires the current JSON package")
+    manifest = read_json(files["source_manifest"])
+    source_files = manifest.get("files")
+    require(isinstance(source_files, list) and bool(source_files), "Source manifest is empty")
+    paths = [checked_file(row) for row in source_files]
+    require(len(set(paths)) == len(paths), "Repeated source file")
+    require([row.get("order") for row in source_files] == list(range(1, len(paths) + 1)), "Invalid source file order")
+    require(all(nonempty(row.get("extraction")) for row in source_files), "Missing extraction method")
+    for source in sources:
+        uri = source.get("source_uri")
+        require(nonempty(uri) and Path(uri).is_absolute() and Path(uri).resolve() in paths,
+                "Source block is not bound to a file in the source manifest")
+    for formula in validate_content(document["blocks"]).values():
+        if "evidence" in formula:
+            require(checked_file(formula["evidence"]) in paths, "Formula evidence is absent from source manifest")
+    source_ids = [row["source_block_id"] for row in sources]
+    semantic = review.get("semantic_review")
+    require(isinstance(semantic, dict) and semantic.get("status") in {"COMPLETED", "INCOMPLETE", "NOT_PERFORMED"},
+            "Missing semantic review status")
+    covered = semantic.get("covered_source_ids")
+    require(isinstance(covered, list) and len(set(covered)) == len(covered) and set(covered) <= set(source_ids),
+            "Invalid semantic review coverage")
+    require(isinstance(semantic.get("open_issues"), list), "Missing open issue list")
+    if semantic["status"] == "COMPLETED":
+        require(set(covered) == set(source_ids), "Completed review has incomplete recorded coverage")
+        require(isinstance(semantic.get("observations"), list) and semantic["observations"]
+                and all(nonempty(s) for s in semantic["observations"]), "Completed review needs substantive observations")
+    decisions, pending = decision_rows(review.get("decisions"), document, set(source_ids))
+    previous_hash = None
+    if previous_review is not None:
+        previous_review = Path(previous_review)
+        previous_hash = hashlib.sha256(previous_review.read_bytes()).hexdigest().upper()
+        old_rows = read_json(previous_review).get("decisions")
+        require(isinstance(old_rows, list), "Previous decision registry is missing")
+        seen = set()
+        for old in old_rows:
+            identifier = old.get("id")
+            require(nonempty(identifier) and identifier not in seen, "Invalid previous decision ID")
+            seen.add(identifier)
+            require(identifier in decisions, f"Previous decision omitted: {identifier}")
+            new = decisions[identifier]
+            keys = ("decision", "targets", "source_block_ids")
+            if any(new.get(key) != old.get(key) for key in keys):
+                require(new.get("supersedes") == digest(old) and new["basis"] != old.get("basis"),
+                        f"Changed decision requires explicit supersedes hash and new basis: {identifier}")
+    removed = {row["source_block_id"] for row in document["transformation_ledger"] if row["disposition"] == "removed_nonsemantic"}
+    partial_quotes = [row["quote"] for row in document["transformation_ledger"] if row["disposition"] == "removed_nonsemantic_span"]
+    count = lambda text: len(re.findall(r"\S+", text))
+    return {**receipt, "status": "PACKAGE_VALIDATED", "review_sha256": hashlib.sha256(review_path.read_bytes()).hexdigest().upper(),
+            "lecture_sha256": artifacts["lecture"]["sha256"].upper(), "source_files": len(paths),
+            "decisions": len(decisions), "pending_decisions": pending,
+            "previous_review_sha256": previous_hash, "history_check": "CHECKED" if previous_hash else "NOT_REQUESTED",
+            "recorded_semantic_status": semantic["status"], "open_issues": semantic["open_issues"],
+            "decision_authority": "RECORDED_NOT_AUTHENTICATED",
+            "word_counts": {"method": "nonempty whitespace-separated tokens; text fields only",
+                            "source": sum(count(s["text"]) for s in sources),
+                            "removed_noise": sum(count(s["text"]) for s in sources if s["source_block_id"] in removed),
+                            "removed_spans": sum(count(s) for s in partial_quotes),
+                            "lecture": sum(count(block_text(b)) for b in document["blocks"])}}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest="command", required=True)
+    build_parser = commands.add_parser("build")
+    build_parser.add_argument("--sources", type=Path, required=True)
+    build_parser.add_argument("--draft", type=Path, required=True)
+    build_parser.add_argument("--out", type=Path, required=True, help="New output directory; must not exist")
+    check_parser = commands.add_parser("check")
+    check_parser.add_argument("--sources", type=Path, required=True)
+    check_parser.add_argument("--lecture", type=Path, required=True)
+    package_parser = commands.add_parser("check-package")
+    package_parser.add_argument("--review", type=Path, required=True)
+    package_parser.add_argument("--previous-review", type=Path)
+    args = parser.parse_args()
+    try:
+        if args.command == "check-package":
+            receipt = check_package(args.review, args.previous_review)
+        else:
+            sources = read_json(args.sources)
+            if args.command == "build":
+                document, sources = build(sources, read_json(args.draft))
+                receipt = check(sources, document)
+                write_package(args.out, sources, document)
+            else:
+                receipt = check(sources, read_json(args.lecture))
+        print(json.dumps(receipt, ensure_ascii=True, indent=2))
+        return 0
+    except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
+        print(json.dumps({"status": "BLOCKED", "reason": str(error)}, ensure_ascii=True))
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
