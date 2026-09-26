@@ -35,6 +35,7 @@ def geometry(profile, skill_root):
     ascent, descent = font_metrics(skill_root, pt["body_size"])
     return {"size": pt["body_size"], "leading": pt["body_leading"], "ascent": ascent, "descent": descent,
             "gap": mm["paragraph_extra_gap"] * MM, "width": mm["column_width"] * MM,
+            "optical_balance_max_extra_pt": pt.get("optical_balance_max_extra_pt", 0),
             "indent": mm.get("paragraph_first_line_indent", 0) * MM,
             "math_gap": mm.get("display_math_extra_gap", mm["paragraph_extra_gap"]) * MM,
             "heading_size": pt.get("subtopic_title_size", 11),
@@ -170,6 +171,24 @@ def extent(units, gap):
     return total
 
 
+def optical_alignment(columns, style):
+    """Bounded spacing after prose lines in the shorter legal column."""
+    if len(columns) != 2 or not all(columns):
+        return None
+    heights = [extent(units, style["gap"]) for units in columns]
+    short = 0 if heights[0] < heights[1] else 1
+    difference = abs(heights[0] - heights[1])
+    if difference < 0.1:
+        return None
+    indexes = [i for i, unit in enumerate(columns[short][:-1]) if unit["kind"] == "line"]
+    limit = style.get("optical_balance_max_extra_pt", 0)
+    if not indexes or limit <= 0:
+        return None
+    extra = min(difference / len(indexes), limit)
+    return {"short_column": short + 1, "line_indexes": indexes,
+            "added_after_line_pt": extra, "residual_pt": difference - extra * len(indexes)}
+
+
 def line_parts(parts, line_index, paragraph_lines, style):
     """Compute painted widths without changing source text or run ranges."""
     result = [dict(p) for p in parts]
@@ -268,7 +287,9 @@ def paginate(units, capacity, style, *, first_page_only=False):
                 break
         require(found is not None, "An indivisible paragraph or formula exceeds the available body frame")
         end, (cut, heights, reason) = found
-        result.append({"columns": [tail[:cut], tail[cut:end]], "heights": heights, "balance_reason": reason})
+        columns = [tail[:cut], tail[cut:end]]
+        result.append({"columns": columns, "heights": heights, "balance_reason": reason,
+                       "alignment": optical_alignment(columns, style)})
         cursor += end
         if first_page_only:
             break
@@ -377,9 +398,10 @@ def draw_body(canvas, page_layout, page_number, top, style, assets):
     canvas.setFillColorRGB(0.2, 0.2, 0.2)
     for column, units in enumerate(page_layout["columns"], 1):
         y, previous = top, None
+        alignment = page_layout.get("alignment")
         if units:
             y -= units[0].get("heading_top_gap", 0)
-        for unit in units:
+        for index, unit in enumerate(units):
             y += boundary_gap(previous, unit, style["gap"])
             line_id = f"{unit['block_id']}:{unit['content_index']}:{unit['line_index']}"
             heading = unit.get("heading")
@@ -430,6 +452,8 @@ def draw_body(canvas, page_layout, page_number, top, style, assets):
                                              "bbox": [x, upper, x + part["width"], upper + part["height"]]})
                     x += part["width"]
             y += unit["height"]
+            if alignment and column == alignment["short_column"] and index in alignment["line_indexes"]:
+                y += alignment["added_after_line_pt"]
             previous = unit
     return plan
 

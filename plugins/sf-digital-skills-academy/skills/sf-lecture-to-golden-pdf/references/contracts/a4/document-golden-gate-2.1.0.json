@@ -1,7 +1,7 @@
 {
   "$id": "https://sf.education/sf-digital-skills-academy/contracts/a4/2.1.0",
   "schema_version": "2.1.0",
-  "source_golden_sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+  "source_golden_sha256": "DE4694E3A67232FA136DDFC8B47233077AA09A894F889E24A070E8AF6C124A3E",
   "rights_status": "CONFIRMED",
   "requirements": "A33-A45 and M01-M20 retained where compatible; approved study-guide, paragraph and LaTeX requirements 2026-09-12",
   "cover_title": {
@@ -77,7 +77,7 @@
       "implementation_status": "PROFILE_RENDERER_AND_CHECKER_ALIGNED"
     },
     "flow_boundary": "physical-content-zone-not-each-topic-id-preserve-semantic-links",
-    "balance": "best-legal-split-per-physical-zone-between-full-width-bars-or-cards"
+    "balance": "best-legal-split-then-bounded-optical-prose-spacing-max-3.3pt-per-line"
   },
   "rail": {
     "x_mm": 14,
@@ -149,8 +149,8 @@
       47
     ],
     "caption": [
-      7.75,
-      10.5
+      7.2,
+      12.2
     ],
     "toc_section": [
       10.5,

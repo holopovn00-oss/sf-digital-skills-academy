@@ -9,7 +9,7 @@ from pathlib import Path
 
 from lecture_content import VERSION, block_text, formula_items, require
 from latex_math import checked_file, glyphs, placed_matches, validate_asset
-from pdf_flow import allowed_break, best_split, boundary_gap, content_key, extent, geometry, text_width, topic_heading, line_parts, valid_hyphen
+from pdf_flow import allowed_break, best_split, boundary_gap, content_key, extent, geometry, optical_alignment, text_width, topic_heading, line_parts, valid_hyphen
 
 
 def read(path):
@@ -280,12 +280,15 @@ def check_current(manifest_path, media_check, reports_check):
             require(columns[0], "Right column cannot precede an empty left column")
             zone = zones[zone_index] if zones else None
             top = zone["columns"][0]["bbox"][1] if zone else columns[0][0]["top"]
-            for units in columns:
+            alignment = optical_alignment(columns, style)
+            for column_number, units in enumerate(columns, 1):
                 y, previous = top, None
-                for unit in units:
+                for index, unit in enumerate(units):
                     y += boundary_gap(previous, unit, style["gap"])
                     require(abs(unit["top"] - y) <= 0.2, "Paragraph gap, line spacing or column top differs from actual content")
                     y += unit["height"] - (unit.get("heading_top_gap", 0) if previous is None else 0)
+                    if alignment and column_number == alignment["short_column"] and index in alignment["line_indexes"]:
+                        y += alignment["added_after_line_pt"]
                     previous = unit
             together = columns[0] + columns[1]
             bottom = zone["columns"][0]["bbox"][3] if zone else style["bottom"]
@@ -294,11 +297,25 @@ def check_current(manifest_path, media_check, reports_check):
             if zone:
                 require(zone.get("balance", {}).get("status") == optimum[2],
                         "Recorded zone balance differs from measured legal split")
+                recorded = zone.get("balance", {}).get("alignment")
+                if alignment:
+                    require(isinstance(recorded, dict)
+                            and recorded.get("short_column") == alignment["short_column"]
+                            and recorded.get("line_count") == len(alignment["line_indexes"])
+                            and type(recorded.get("added_after_line_pt")) in (int, float)
+                            and abs(recorded["added_after_line_pt"] - alignment["added_after_line_pt"]) <= 0.2,
+                            "Recorded optical column alignment differs from measured legal spacing")
+                else:
+                    require(recorded is None, "Unnecessary optical column alignment recorded")
             heights = [extent(c, style["gap"]) for c in columns]
             reports.append({"page": page, "zone_id": zone["zone_id"] if zone else None,
                             "topic_ids": topics, "line_counts": [len(c) for c in columns],
                             "heights_pt": [round(h, 4) for h in heights], "height_difference_pt": round(abs(heights[0] - heights[1]), 4),
-                            "balance_basis": optimum[2], "measurement": "ACTUAL_GLYPHS_AND_VERIFIED_MATH"})
+                            "balance_basis": optimum[2],
+                            "optical_alignment": {"short_column": alignment["short_column"],
+                                                  "added_after_line_pt": round(alignment["added_after_line_pt"], 4),
+                                                  "residual_pt": round(alignment["residual_pt"], 4)} if alignment else None,
+                            "measurement": "ACTUAL_GLYPHS_AND_VERIFIED_MATH"})
         for i in range(1, len(measured)):
             if (measured[i]["page"], measured[i]["column"]) != (measured[i-1]["page"], measured[i-1]["column"]):
                 require(allowed_break(measured, i, style), "Paragraph widow/orphan or indivisible content was split")

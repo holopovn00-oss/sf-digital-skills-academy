@@ -41,6 +41,23 @@ class ColumnBalanceChecks(unittest.TestCase):
         rows = [r for r in self.plan["text"] if r.get("content_index") == 0 and r.get("block_id") == "b1"]
         self.assertEqual("".join(r["text"] for r in rows), self.text)
 
+    def test_actual_prose_column_bottoms_align_within_bounded_spacing(self):
+        import fitz
+        self.candidate()
+        self.assertEqual(self.check()["status"], "PDF_MECHANICS_VALIDATED")
+        bottoms = {}
+        for row in self.plan["text"]:
+            if row.get("block_id"):
+                key = row["page"], row["column"]
+                bottoms[key] = max(bottoms.get(key, 0), row["bbox"][3])
+        pairs = [(bottoms[(page, 1)], bottoms[(page, 2)])
+                 for page in range(1, max(page for page, _ in bottoms) + 1)
+                 if (page, 1) in bottoms and (page, 2) in bottoms]
+        self.assertTrue(pairs)
+        self.assertTrue(any(abs(left - right) < 0.3 for left, right in pairs))
+        with fitz.open(self.root / "candidate.pdf") as doc:
+            self.assertEqual(len(doc), max(page for page, _ in bottoms))
+
     def test_legacy_manifest_rejected(self):
         self.candidate()
         self.manifest["schema_version"] = "1.0"

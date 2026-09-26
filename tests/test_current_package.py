@@ -30,7 +30,7 @@ class CurrentPackageChecks(unittest.TestCase):
                 self.assertIn(key, manifest["files"])
                 self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest().upper(), manifest["files"][key])
         path = PDF_ROOT / "assets/golden/golden.pdf"
-        self.assertEqual(manifest["golden_sha256"], "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58")
+        self.assertEqual(manifest["golden_sha256"], "DE4694E3A67232FA136DDFC8B47233077AA09A894F889E24A070E8AF6C124A3E")
         with fitz.open(path) as doc:
             self.assertEqual(len(doc), 28)
             self.assertEqual(len(doc), manifest["golden_pages"])

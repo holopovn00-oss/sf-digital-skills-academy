@@ -11,6 +11,7 @@ from test_json_content import ROOT, H, fixture, ref
 from render_golden import render
 from verify_candidate import check
 from verify_golden_zones import check as check_zones
+from visual_policy import caption_fields
 
 
 class GoldenZoneChecks(unittest.TestCase):
@@ -94,11 +95,21 @@ class GoldenZoneChecks(unittest.TestCase):
         Image.new("RGB",(320,160),"white").save(image)
         composition={"visuals":[{"visual_id":"authored","origin":"authored",
             "image":ref(image),"source":ref(image),"text_block_ids":["b1"],
-            "role":"explanation","caption":"Источник: Авторская схема\nСлайд №: не применимо\nТема: Последовательность проверки",
+            "role":"explanation","caption":"Источник: Авторская схема\nСлайд №\nТема: Последовательность проверки",
             "authoring":{"authorization":"Explicit synthetic test permission","basis":"Selected block b1"},
             "lecturer_photo_review":"absent"}]}
         path,data=self.generate(composition=composition)
         self.assertEqual(check(path)["status"],"PDF_MECHANICS_VALIDATED")
+        plan=json.loads(Path(data["artifacts"]["render_plan"]["path"]).read_text(encoding="utf-8"))
+        row=next(r for r in plan["text"] if r.get("visual_id")=="authored")
+        with fitz.open(data["artifacts"]["pdf"]["path"]) as doc:
+            caption=doc[row["page"]-1].get_textbox(row["bbox"])
+            spans=[s for block in doc[row["page"]-1].get_text("dict",clip=fitz.Rect(row["bbox"]))["blocks"]
+                   if "lines" in block for line in block["lines"] for s in line["spans"]]
+        self.assertEqual(caption_fields(caption,blank_slide_for_authored=True)[1],"")
+        baselines=[s["origin"][1] for s in spans]
+        self.assertEqual(len(baselines),3)
+        self.assertTrue(all(abs(b-a-12.2)<0.25 for a,b in zip(baselines,baselines[1:])))
 
     def test_long_source_wraps_before_explicit_blank_slide_field(self):
         from PIL import Image

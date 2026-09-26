@@ -1,17 +1,17 @@
 {
   "schema_version": "golden-acceptance/1.0",
   "accepted_on": "2026-09-26",
-  "user_decision": "Selected graphite, agreed to omit underlines, and authorized GitHub work on the stated v11 plan.",
-  "acceptance_scope": "Design choices and GitHub transfer of the displayed v11 reference are authorized; a separate full-document manual acceptance is not claimed.",
+  "user_decision": "Approved the displayed v13 layout and authorized the stated repository implementation and pull request.",
+  "acceptance_scope": "The v13 layout corrections and GitHub pull request are authorized; a separate full-document manual content acceptance is not claimed.",
   "manual_full_document_review": false,
   "version": "0.1.0",
   "pdf": "../assets/golden/golden.pdf",
-  "sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+  "sha256": "DE4694E3A67232FA136DDFC8B47233077AA09A894F889E24A070E8AF6C124A3E",
   "pages": 28,
   "profile": "adapters/a4/2.1.0.json",
-  "profile_sha256": "890490920FABC94F274174264116F7B645912462B733F96D677772D85A304946",
+  "profile_sha256": "DB0DF0D40936FD1FFAA9C5B258461AB2A556E8155E544B8BE8BA191745CCB08A",
   "contract": "contracts/a4/document-golden-gate-2.1.0.json",
-  "contract_sha256": "9B069B7362285F372493252AC7BA3101269F9767564C9185D5DE75DEFF2E36B3",
+  "contract_sha256": "B26739115B250DF1CE155F163200FC8BCA282D187F28CE36BE581964153CCD21",
   "targeted_checks": {
     "A4_pages": 28,
     "toc_topic_links": 32,
@@ -19,15 +19,28 @@
     "toc_underlines": 0,
     "bookmarks": 39,
     "figure_captions_with_three_fields": 17,
-    "in_card_video_lines": 0
+    "in_card_video_lines": 0,
+    "two_column_zones": 43,
+    "zones_with_optical_alignment": 17,
+    "maximum_added_line_spacing_pt": 3.275,
+    "inner_visual_logos_removed": 12,
+    "internal_links": 134
   },
   "visual_review": {
-    "reviewer": "current_agent",
+    "reviewer": "local_candidate_agent",
     "independent": false,
     "pages_reviewed_at_full_size": [
-      2
+      2,
+      3,
+      4,
+      10,
+      15,
+      23,
+      26,
+      28
     ],
-    "result": "Graphite contents reviewed; a new full-document manual review is not claimed."
+    "contact_sheets_reviewed_for_pages": "1-28",
+    "result": "Local v13 layout reviewed and approved in chat; full-document manual content acceptance is not claimed."
   },
   "standard_validator": "NOT_CERTIFIED: this pinned multi-zone example has not passed the standard candidate validator."
 }
