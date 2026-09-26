@@ -573,9 +573,14 @@ def render(lecture_path, out, *, composition_path=None, handoff_path=None, workf
             bottom=zone["body_top"]+max(zone["layout"]["heights"])+.1
             columns=[{"column":col,"bbox":[style["x"][col-1],zone["body_top"],style["x"][col-1]+style["width"],bottom],
                       "line_ids":[r["line_id"] for r in rows["flow"] if r["column"]==col]} for col in (1,2)]
+            alignment=zone["layout"].get("alignment")
+            balance={"status":zone["layout"]["balance_reason"],"reason":"Measured best legal split"}
+            if alignment:
+                balance["alignment"]={"short_column":alignment["short_column"],
+                                      "line_count":len(alignment["line_indexes"]),
+                                      "added_after_line_pt":alignment["added_after_line_pt"]}
             zones.append({"zone_id":f"zone-{len(zones)+1}","page":current_number,"topic_id":zone["topic_id"],
-                          "divider":divider,"columns":columns,
-                          "balance":{"status":zone["layout"]["balance_reason"],"reason":"Measured best legal split"}})
+                          "divider":divider,"columns":columns,"balance":balance})
         footer(page["zones"][0]["topic_id"])
         canvas.showPage()
     canvas.save()

@@ -22,7 +22,7 @@
   "powerpoint_runtime": false,
   "rights_status": "CONFIRMED",
   "document_grammar_contract": "contracts/a4/document-golden-gate-2.1.0.json",
-  "document_grammar_sha256": "9B069B7362285F372493252AC7BA3101269F9767564C9185D5DE75DEFF2E36B3",
+  "document_grammar_sha256": "B26739115B250DF1CE155F163200FC8BCA282D187F28CE36BE581964153CCD21",
   "font": {
     "family": "Inter",
     "delivery": "external-verified",
@@ -186,6 +186,7 @@
     "pt": {
       "body_size": 9.5,
       "body_leading": 13.1,
+      "optical_balance_max_extra_pt": 3.3,
       "cover_title_size": 39,
       "cover_title_leading": 47,
       "small_label_size": 7.75,
@@ -194,8 +195,8 @@
       "topic_title_leading": 29,
       "subtopic_title_size": 11,
       "subtopic_title_leading": 14,
-      "caption_size": 7.75,
-      "caption_leading": 10.5,
+      "caption_size": 7.2,
+      "caption_leading": 12.2,
       "video_size": 7.75,
       "video_leading": 10.5,
       "toc_section_size": 10.5,

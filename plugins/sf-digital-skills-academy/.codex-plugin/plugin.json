@@ -8,7 +8,7 @@
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "Digital Skills Academy",
+    "displayName": "Sf Digital Skills Academy",
     "shortDescription": "Полный цикл или прямой выбранный навык.",
     "longDescription": "Общий вход запускает полный цикл: материалы, учебный текст JSON с LaTeX, фактчек с решениями человека, выбранная новая редакция и PDF-кандидат. Три специализированных навыка остаются прямыми изолированными режимами: они не переходят к следующему этапу автоматически.",
     "developerName": "holopovn00-oss",

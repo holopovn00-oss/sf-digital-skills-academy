@@ -59,10 +59,14 @@ class VisualPolicyTests(unittest.TestCase):
             path=Path(tmp)/'authored.png';path.write_bytes(b'generated diagram')
             reference={'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
             visual={'origin':'authored','source':reference,'image':reference,
-                'caption':'Источник: Авторская схема\nСлайд №: не применимо\nТема: Объяснение','text_block_ids':['b1'],
+                'caption':'Источник: Авторская схема\nСлайд №\nТема: Объяснение','text_block_ids':['b1'],
                 'authoring':{'authorization':'User explicitly allowed diagrams','basis':'Checked block b1'},
                 'lecturer_photo_review':'absent'}
             validate_sources({'visuals':[visual]})
+            broken=copy.deepcopy(visual)
+            broken['caption']='Источник: Авторская схема\nСлайд №: не применимо\nТема: Объяснение'
+            with self.assertRaisesRegex(ValueError,'empty Слайд'):
+                validate_sources({'visuals':[broken]})
             for field in ('authorization','basis'):
                 broken=copy.deepcopy(visual);broken['authoring'][field]=''
                 with self.assertRaises(ValueError):validate_sources({'visuals':[broken]})

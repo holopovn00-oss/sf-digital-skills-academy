@@ -81,7 +81,7 @@
   "source_path_basis": "Relative to the original SF-Lecture-Publisher installation; historical provenance, not a runtime dependency.",
   "current_golden": {
     "file": "assets/golden/golden.pdf",
-    "sha256": "5B5ECAF88E6C9873CA1C224A9ED56FBA138263ED82FB9DACA00740B5EEFD1E58",
+    "sha256": "DE4694E3A67232FA136DDFC8B47233077AA09A894F889E24A070E8AF6C124A3E",
     "pages": 28,
     "brand": "Digital Skills Academy"
   },

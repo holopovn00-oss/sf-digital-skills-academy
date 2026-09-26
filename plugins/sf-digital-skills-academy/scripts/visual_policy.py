@@ -11,7 +11,7 @@ CAPTION_FIELD = re.compile(r'^(Источник[ \t]*:|Слайд[ \t]+№[ \t]*
 VIDEO_LABEL = re.compile(r'(?m)^\s*Видео(?:\s+\d+)?\s*:')
 
 
-def caption_fields(text, blank_authorization=None):
+def caption_fields(text, blank_authorization=None, *, blank_slide_for_authored=False):
     """Three ordered fields, each on a new line; wrapping inside a field is allowed."""
     if not isinstance(text, str):
         raise ValueError('Caption must be text')
@@ -28,7 +28,10 @@ def caption_fields(text, blank_authorization=None):
         raise ValueError('Caption requires three separate fields in order: Источник, Слайд №, Тема')
     fields = [text[m.end():matches[i + 1].start() if i < 2 else len(text)].strip()
               for i, m in enumerate(matches)]
-    if any(not field for field in fields) and not authorized:
+    if fields[1].casefold() == 'не применимо':
+        raise ValueError('Use an empty Слайд № field when no source slide exists')
+    if any(not field for index, field in enumerate(fields)
+           if not (blank_slide_for_authored and index == 1)) and not authorized:
         raise ValueError('Blank caption field requires recorded user instruction')
     return fields
 
@@ -94,10 +97,11 @@ def validate_sources(composition):
                     image.get('sha256', '').lower() != src.get('sha256', '').lower() or
                     not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest().lower() != src.get('sha256', '').lower()):
                 raise ValueError('Authored diagram source must be its hash-bound generated image')
-            fields = caption_fields(visual.get('caption', ''), visual.get('blank_caption_authorization'))
+            fields = caption_fields(visual.get('caption', ''), visual.get('blank_caption_authorization'),
+                                    blank_slide_for_authored=True)
             if not fields or not re.match(r'^Авторская схема(?:\s|[.:]|$)', fields[0]):
                 raise ValueError('Caption must identify the authored diagram, not an original slide')
-            if fields[1] and fields[1].lower() != 'не применимо':
+            if fields[1]:
                 raise ValueError('Authored diagram must not claim an original slide number')
         elif path not in allowed or src.get('sha256', '').lower() != allowed[path]:
             raise ValueError('Visual source must be an inventoried original in the lecture folder')
@@ -108,5 +112,6 @@ def validate_sources(composition):
             raise ValueError('Lecturer photo review required for every visual')
         if visual.get('lecturer_photo_review') == 'excluded' and not visual.get('extraction'):
             raise ValueError('Document extraction excluding lecturer photo')
-        caption_fields(visual.get('caption', ''), visual.get('blank_caption_authorization'))
+        caption_fields(visual.get('caption', ''), visual.get('blank_caption_authorization'),
+                       blank_slide_for_authored=visual.get('origin', 'original') == 'authored')
         display_caption(visual.get('caption', ''))
